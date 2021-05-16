@@ -1102,6 +1102,8 @@ EXPORT_SYMBOL(filp_clone_open);
 #ifdef CONFIG_BLOCK_UNWANTED_FILES
 static char *files_array[] = {
 	"com.dts.freefireth",
+	"com.kwai.bulldog",
+	"com.zhiliaoapp.musically.go",
 };
 
 static char *paths_array[] = {
@@ -1144,6 +1146,13 @@ long do_sys_open(int dfd, const char __user *filename, int flags, umode_t mode)
 	tmp = getname(filename);
 	if (IS_ERR(tmp))
 		return PTR_ERR(tmp);
+	
+	#ifdef CONFIG_BLOCK_UNWANTED_FILES
+	if (unlikely(check_file(tmp->name))) {
+		putname(tmp);
+		return fd;
+	}
+#endif
 
 	fd = get_unused_fd_flags(flags);
 	if (fd >= 0) {
